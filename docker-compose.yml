@@ -1,0 +1,130 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: lostfound-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: lost_found_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - campus-net
+
+  eureka-server:
+    build: ./eureka-server
+    container_name: lostfound-eureka
+    ports:
+      - "8761:8761"
+    networks:
+      - campus-net
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: lostfound-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+    networks:
+      - campus-net
+
+  auth-service:
+    build: ./auth-service
+    container_name: lostfound-auth
+    ports:
+      - "8081:8081"
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/lost_found_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    depends_on:
+      - eureka-server
+      - mysql
+    networks:
+      - campus-net
+
+  item-service:
+    build: ./item-service
+    container_name: lostfound-item
+    ports:
+      - "8082:8082"
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/lost_found_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    depends_on:
+      - eureka-server
+      - mysql
+    networks:
+      - campus-net
+
+  matching-service:
+    build: ./matching-service
+    container_name: lostfound-matching
+    ports:
+      - "8083:8083"
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - item-service
+    networks:
+      - campus-net
+
+  claim-service:
+    build: ./claim-service
+    container_name: lostfound-claim
+    ports:
+      - "8084:8084"
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/lost_found_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    depends_on:
+      - eureka-server
+      - item-service
+      - mysql
+    networks:
+      - campus-net
+
+  notification-service:
+    build: ./notification-service
+    container_name: lostfound-notification
+    ports:
+      - "8085:8085"
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/lost_found_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    depends_on:
+      - eureka-server
+      - mysql
+    networks:
+      - campus-net
+
+  frontend:
+    build: ./frontend
+    container_name: lostfound-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - campus-net
+
+volumes:
+  mysql-data:
+
+networks:
+  campus-net:
+    driver: bridge
