@@ -14,6 +14,8 @@ export default function ReportItemModal({ isOpen, onClose, initialType = 'LOST',
   const [brand, setBrand] = useState('');
   const [color, setColor] = useState('');
   const [description, setDescription] = useState('');
+  const [highValue, setHighValue] = useState(false);
+  const [privateDetails, setPrivateDetails] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
@@ -116,6 +118,8 @@ export default function ReportItemModal({ isOpen, onClose, initialType = 'LOST',
         color,
         description,
         imageUrl: finalImageUrl,
+        highValue,
+        privateDetails: type === 'FOUND' && privateDetails ? privateDetails.trim() : undefined,
       };
 
       const res = type === 'LOST'
@@ -264,15 +268,50 @@ export default function ReportItemModal({ isOpen, onClose, initialType = 'LOST',
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Description</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Public Description</label>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Provide identifiable markings, stickers, engravings, or circumstances..."
+              placeholder="Provide general appearance or circumstances (avoid revealing unique secret identifying marks here)..."
               className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
+
+          {/* High-Value Item Flag */}
+          <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 flex items-start gap-3">
+            <input
+              type="checkbox"
+              id="highValueCheck"
+              checked={highValue}
+              onChange={(e) => setHighValue(e.target.checked)}
+              className="mt-0.5 w-4 h-4 text-amber-600 rounded border-amber-300 focus:ring-amber-500 cursor-pointer"
+            />
+            <label htmlFor="highValueCheck" className="text-xs text-amber-900 cursor-pointer select-none">
+              <strong className="block font-semibold">Mark as High-Value Item</strong>
+              Check this if this item is valuable (gold ornaments, laptops, smartphones, expensive watches, etc.). High-value items require strict administrator verification before handover.
+            </label>
+          </div>
+
+          {/* Private Identifying Details for FOUND items */}
+          {type === 'FOUND' && (
+            <div className="p-3 bg-indigo-50/70 rounded-xl border border-indigo-200 space-y-1.5">
+              <label className="block text-xs font-bold text-indigo-950 flex items-center gap-1.5">
+                🔒 Private Verification Details (Confidential — Admin Only)
+              </label>
+              <p className="text-[11px] text-indigo-700 leading-relaxed">
+                Enter unique marks, engravings, serial number, lock screen wallpaper, or hidden items. 
+                <span className="font-semibold text-indigo-900"> This will NEVER be shown publicly</span> to other students. Campus administrators use this to compare against claimant submissions.
+              </p>
+              <textarea
+                rows={2}
+                value={privateDetails}
+                onChange={(e) => setPrivateDetails(e.target.value)}
+                placeholder="e.g. Serial #ABC1234, engraving 'To Rahul 2024' inside lid, red sticker underneath..."
+                className="w-full px-3 py-2 text-xs rounded-lg border border-indigo-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          )}
 
           {/* Image Upload */}
           <div>

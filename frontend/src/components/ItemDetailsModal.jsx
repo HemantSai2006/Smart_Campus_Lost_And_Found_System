@@ -43,7 +43,7 @@ export default function ItemDetailsModal({ isOpen, onClose, item, onClaim, onDel
             <X className="w-5 h-5" />
           </button>
 
-          <div className="absolute bottom-3 left-3 flex gap-2">
+          <div className="absolute bottom-3 left-3 flex flex-wrap gap-2">
             <span className={`px-2.5 py-1 rounded text-xs font-bold uppercase shadow ${
               item.type === 'LOST' ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
             }`}>
@@ -52,6 +52,11 @@ export default function ItemDetailsModal({ isOpen, onClose, item, onClaim, onDel
             <span className="px-2.5 py-1 rounded text-xs font-bold uppercase shadow bg-white/90 text-slate-800">
               STATUS: {item.status}
             </span>
+            {item.highValue && (
+              <span className="px-2.5 py-1 rounded text-xs font-bold uppercase shadow bg-amber-500 text-white flex items-center gap-1">
+                ★ High-Value Item
+              </span>
+            )}
           </div>
         </div>
 

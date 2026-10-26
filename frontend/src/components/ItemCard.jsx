@@ -40,7 +40,7 @@ export default function ItemCard({ item, onViewDetails, onClaim, onDelete }) {
         )}
 
         {/* Badges Overlay */}
-        <div className="absolute top-2 left-2 flex gap-1.5">
+        <div className="absolute top-2 left-2 flex flex-wrap gap-1.5">
           <span className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase shadow-sm ${
             item.type === 'LOST' ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
           }`}>
@@ -49,6 +49,11 @@ export default function ItemCard({ item, onViewDetails, onClaim, onDelete }) {
           <span className={`px-2 py-0.5 rounded text-[11px] font-semibold border uppercase shadow-sm ${getStatusColor(item.status)}`}>
             {item.status}
           </span>
+          {item.highValue && (
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500 text-white shadow-sm flex items-center gap-0.5">
+              ★ High Value
+            </span>
+          )}
         </div>
 
         {canDelete && (

@@ -16,6 +16,13 @@ public interface ItemClient {
     @GetMapping("/api/items/{id}")
     ApiResponse<ItemDto> getItemById(@PathVariable("id") Long id);
 
+    /**
+     * Admin-only endpoint: returns item with privateDetails included.
+     * Used by claim-service to show finder's private identifying info to admins during verification.
+     */
+    @GetMapping("/api/items/{id}/admin")
+    ApiResponse<ItemDto> getItemByIdAdmin(@PathVariable("id") Long id);
+
     @PutMapping("/api/items/{id}/status")
     ApiResponse<Object> updateItemStatus(@PathVariable("id") Long id, @RequestBody StatusUpdateRequest request);
 }

@@ -65,7 +65,7 @@ public class CloudinaryService {
                 @SuppressWarnings("rawtypes")
                 Map result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
                         "folder", "smart-campus-lost-found",
-                        "resource_type", "image"
+                        "resource_type", "auto"
                 ));
                 return (String) result.get("secure_url");
             } catch (Exception e) {

@@ -20,6 +20,10 @@ public class ItemDto {
     private String reporterEmail;
     private String reporterPhone;
     private LocalDateTime createdAt;
+    /** High-value flag (gold, laptop, phone, etc.) */
+    private boolean highValue;
+    /** Private identifying details entered by finder — only returned from admin endpoint */
+    private String privateDetails;
 
     public ItemDto() {}
 
@@ -70,4 +74,10 @@ public class ItemDto {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public boolean isHighValue() { return highValue; }
+    public void setHighValue(boolean highValue) { this.highValue = highValue; }
+
+    public String getPrivateDetails() { return privateDetails; }
+    public void setPrivateDetails(String privateDetails) { this.privateDetails = privateDetails; }
 }

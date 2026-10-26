@@ -244,6 +244,27 @@ export const claimAPI = {
     return handleResponse(res);
   },
 
+  markUnderVerification: async (id, verificationNotes) => {
+    const res = await fetch(`${API_BASE}/claims/${id}/under-verification`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ verificationNotes }),
+    });
+    return handleResponse(res);
+  },
+
+  confirmHandover: async (id, handoverData) => {
+    const payload = typeof handoverData === 'string'
+      ? { notes: handoverData }
+      : (handoverData || {});
+    const res = await fetch(`${API_BASE}/claims/${id}/confirm-handover`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+    return handleResponse(res);
+  },
+
   rejectClaim: async (id, adminComment) => {
     const res = await fetch(`${API_BASE}/claims/${id}/reject`, {
       method: 'PUT',

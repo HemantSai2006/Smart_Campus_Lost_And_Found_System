@@ -22,6 +22,7 @@ public class ItemResponse {
     private String reporterName;
     private String reporterEmail;
     private String reporterPhone;
+    private boolean highValue;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -72,6 +73,9 @@ public class ItemResponse {
 
     public String getReporterPhone() { return reporterPhone; }
     public void setReporterPhone(String reporterPhone) { this.reporterPhone = reporterPhone; }
+
+    public boolean isHighValue() { return highValue; }
+    public void setHighValue(boolean highValue) { this.highValue = highValue; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

@@ -31,6 +31,10 @@ public class CreateItemRequest {
     private String brand;
     private String color;
     private String imageUrl;
+    /** High-value flag (gold, laptop, phone, etc.) */
+    private boolean highValue = false;
+    /** Private identifying details — only for FOUND items, never shown publicly */
+    private String privateDetails;
 
     public CreateItemRequest() {}
 
@@ -60,4 +64,10 @@ public class CreateItemRequest {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public boolean isHighValue() { return highValue; }
+    public void setHighValue(boolean highValue) { this.highValue = highValue; }
+
+    public String getPrivateDetails() { return privateDetails; }
+    public void setPrivateDetails(String privateDetails) { this.privateDetails = privateDetails; }
 }

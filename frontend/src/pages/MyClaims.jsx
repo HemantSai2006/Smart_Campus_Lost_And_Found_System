@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, RefreshCw, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { ShieldCheck, RefreshCw, AlertCircle, CheckCircle, Clock, FileText, ExternalLink, AlertTriangle } from 'lucide-react';
 import { claimAPI } from '../services/api';
 
 export default function MyClaims() {
@@ -29,6 +29,42 @@ export default function MyClaims() {
     fetchClaims();
   }, []);
 
+  const getStatusBadge = (claim) => {
+    switch (claim.status) {
+      case 'UNDER_VERIFICATION':
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-blue-100 text-blue-800 border border-blue-200 flex items-center gap-1">
+            <Clock className="w-3 h-3" /> Under Verification
+          </span>
+        );
+      case 'APPROVED':
+        if (claim.handoverAt) {
+          return (
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+              <CheckCircle className="w-3 h-3" /> Handover Complete
+            </span>
+          );
+        }
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+            <CheckCircle className="w-3 h-3" /> Approved (Awaiting Handover)
+          </span>
+        );
+      case 'REJECTED':
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-red-100 text-red-800 border border-red-200">
+            Rejected
+          </span>
+        );
+      default:
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
+            <Clock className="w-3 h-3" /> Pending Review
+          </span>
+        );
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
@@ -38,13 +74,13 @@ export default function MyClaims() {
             My Submitted Ownership Claims
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Monitor verification progress and administrative decisions on your claims.
+            Monitor verification progress, submit supporting evidence, and view physical handover status.
           </p>
         </div>
 
         <button
           onClick={fetchClaims}
-          className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500"
+          className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500 transition cursor-pointer"
           title="Refresh"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -81,45 +117,100 @@ export default function MyClaims() {
           {claims.map(claim => (
             <div
               key={claim.id}
-              className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3"
+              className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3 flex flex-col justify-between"
             >
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <span className="text-[10px] text-slate-400 font-mono">Claim #{claim.id}</span>
-                  <h3 className="text-base font-bold text-slate-900">{claim.itemName}</h3>
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-slate-400 font-mono">Claim #{claim.id}</span>
+                      {claim.highValue && (
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-amber-500 text-white">
+                          ★ High Value
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-base font-bold text-slate-900 mt-0.5">{claim.itemName}</h3>
+                  </div>
+                  <div>{getStatusBadge(claim)}</div>
                 </div>
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                  claim.status === 'APPROVED'
-                    ? 'bg-emerald-100 text-emerald-800'
-                    : claim.status === 'REJECTED'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-amber-100 text-amber-800'
-                }`}>
-                  {claim.status}
-                </span>
-              </div>
 
-              <div className="text-xs bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
-                <span className="font-semibold text-slate-700 block">Your Proof Description:</span>
-                <p className="text-slate-600">{claim.ownershipDescription}</p>
-                {claim.proofDetails && (
-                  <p className="text-slate-500 text-[11px] pt-1 border-t border-slate-200">
-                    <strong>Details:</strong> {claim.proofDetails}
-                  </p>
+                {/* Handover Notice Banner */}
+                {claim.status === 'APPROVED' && !claim.handoverAt && (
+                  <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-300 text-emerald-950 text-xs">
+                    <strong className="block font-bold mb-0.5">🎉 Claim Approved — Ready for Physical Handover!</strong>
+                    <span>
+                      Please visit the campus Lost & Found desk (Admin/Security Office) with your Student ID card to verify and collect your item.
+                    </span>
+                  </div>
+                )}
+
+                {/* Completed Handover Banner */}
+                {claim.handoverAt && (
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 text-xs">
+                    <strong className="block font-semibold text-slate-900 mb-0.5">Item Successfully Returned</strong>
+                    <span>Handed over to <strong>{claim.handoverRecipient || claim.claimantName}</strong> {claim.handoverRecipientStudentId && `(Student ID: ${claim.handoverRecipientStudentId}) `}by admin <strong>{claim.handoverConfirmedBy || 'Staff'}</strong> on {new Date(claim.handoverAt).toLocaleString()}.</span>
+                  </div>
+                )}
+
+                {/* Under Verification Banner */}
+                {claim.status === 'UNDER_VERIFICATION' && (
+                  <div className="p-3 bg-blue-50 rounded-xl border border-blue-200 text-blue-900 text-xs">
+                    <strong className="block font-bold mb-0.5">🔍 Active Manual Verification in Progress</strong>
+                    <span>
+                      An authorized college administrator is reviewing your submitted evidence against the item's private identifying details.
+                    </span>
+                    {claim.verificationNotes && (
+                      <p className="mt-1 pt-1 border-t border-blue-200 text-[11px] text-blue-800">
+                        <strong>Admin Notes:</strong> {claim.verificationNotes}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <div className="text-xs bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2">
+                  <div>
+                    <span className="font-semibold text-slate-700 block mb-0.5">Your Ownership Description:</span>
+                    <p className="text-slate-600 leading-relaxed">{claim.ownershipDescription}</p>
+                  </div>
+
+                  {claim.proofDetails && (
+                    <div className="pt-2 border-t border-slate-200">
+                      <span className="font-semibold text-slate-700 block mb-0.5">Secret Details Submitted:</span>
+                      <p className="text-slate-600">{claim.proofDetails}</p>
+                    </div>
+                  )}
+
+                  {claim.proofFileUrl && (
+                    <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                      <span className="font-semibold text-slate-700 flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-indigo-600" />
+                        Supporting Proof Document
+                      </span>
+                      <a
+                        href={claim.proofFileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                      >
+                        View File <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
+                </div>
+
+                {/* Admin Feedback */}
+                {claim.adminComment && (
+                  <div className={`p-3 rounded-xl text-xs ${
+                    claim.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-red-50 text-red-900 border border-red-200'
+                  }`}>
+                    <span className="font-bold block mb-0.5">Authority Feedback:</span>
+                    <span>{claim.adminComment}</span>
+                  </div>
                 )}
               </div>
 
-              {/* Admin Comment */}
-              {claim.adminComment && (
-                <div className={`p-3 rounded-xl text-xs ${
-                  claim.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-red-50 text-red-900 border border-red-200'
-                }`}>
-                  <span className="font-bold block">Authority Feedback:</span>
-                  <span>{claim.adminComment}</span>
-                </div>
-              )}
-
-              <div className="text-[10px] text-slate-400 flex items-center justify-between pt-1">
+              <div className="text-[10px] text-slate-400 flex items-center justify-between pt-2 border-t border-slate-100">
                 <span>Submitted on: {claim.createdAt ? new Date(claim.createdAt).toLocaleDateString() : 'Recent'}</span>
               </div>
             </div>

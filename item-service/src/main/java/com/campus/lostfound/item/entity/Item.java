@@ -34,6 +34,17 @@ public class Item {
     private String brand;
     private String color;
 
+    /** True for valuable items: gold ornaments, laptops, phones, etc. */
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean highValue = false;
+
+    /**
+     * Private identifying details entered by the FINDER (e.g., engravings, scratches, serial numbers).
+     * NEVER returned in public-facing API responses — only via admin-only endpoint.
+     */
+    @Column(columnDefinition = "TEXT")
+    private String privateDetails;
+
     @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
@@ -114,6 +125,12 @@ public class Item {
 
     public String getReporterPhone() { return reporterPhone; }
     public void setReporterPhone(String reporterPhone) { this.reporterPhone = reporterPhone; }
+
+    public boolean isHighValue() { return highValue; }
+    public void setHighValue(boolean highValue) { this.highValue = highValue; }
+
+    public String getPrivateDetails() { return privateDetails; }
+    public void setPrivateDetails(String privateDetails) { this.privateDetails = privateDetails; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

@@ -48,6 +48,10 @@ public class ItemService {
         item.setColor(request.getColor() != null && !request.getColor().isBlank() ? request.getColor().trim() : null);
         item.setImageUrl(request.getImageUrl());
         item.setStatus(ItemStatus.REPORTED);
+        item.setHighValue(request.isHighValue());
+        if (request.getPrivateDetails() != null && !request.getPrivateDetails().isBlank()) {
+            item.setPrivateDetails(request.getPrivateDetails().trim());
+        }
 
         item.setUserId(userId != null ? userId : 1L);
         item.setReporterName(userName != null ? userName : "Campus Student");
@@ -175,6 +179,33 @@ public class ItemService {
         res.setReporterName(item.getReporterName());
         res.setReporterEmail(item.getReporterEmail());
         res.setReporterPhone(item.getReporterPhone());
+        res.setHighValue(item.isHighValue());
+        res.setCreatedAt(item.getCreatedAt());
+        res.setUpdatedAt(item.getUpdatedAt());
+        return res;
+    }
+
+    public AdminItemResponse getAdminItemById(Long id) {
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + id));
+        AdminItemResponse res = new AdminItemResponse();
+        res.setId(item.getId());
+        res.setType(item.getType());
+        res.setName(item.getName());
+        res.setCategory(item.getCategory());
+        res.setDescription(item.getDescription());
+        res.setDate(item.getDate());
+        res.setLocation(item.getLocation());
+        res.setBrand(item.getBrand());
+        res.setColor(item.getColor());
+        res.setImageUrl(item.getImageUrl());
+        res.setStatus(item.getStatus());
+        res.setUserId(item.getUserId());
+        res.setReporterName(item.getReporterName());
+        res.setReporterEmail(item.getReporterEmail());
+        res.setReporterPhone(item.getReporterPhone());
+        res.setHighValue(item.isHighValue());
+        res.setPrivateDetails(item.getPrivateDetails());
         res.setCreatedAt(item.getCreatedAt());
         res.setUpdatedAt(item.getUpdatedAt());
         return res;

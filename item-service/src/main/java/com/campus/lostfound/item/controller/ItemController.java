@@ -91,6 +91,14 @@ public class ItemController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Item retrieved successfully", item));
     }
 
+    @GetMapping("/{id:[0-9]+}/admin")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN')")
+    @Operation(summary = "Get item by ID with private details for admin / claim-service", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<ApiResponse<AdminItemResponse>> getItemByIdAdmin(@PathVariable("id") Long id) {
+        AdminItemResponse item = itemService.getAdminItemById(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Admin item details retrieved successfully", item));
+    }
+
     @GetMapping("/my")
     @Operation(summary = "Get currently authenticated user's reported items", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponse<List<ItemResponse>>> getMyItems(
@@ -172,8 +180,11 @@ public class ItemController {
             return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Image size exceeds the 5 MB limit"));
         }
         String contentType = file.getContentType();
-        if (contentType != null && !contentType.startsWith("image/")) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Only JPG, PNG, or WEBP images are supported"));
+        boolean isImage = contentType != null && contentType.startsWith("image/");
+        boolean isPdf = "application/pdf".equalsIgnoreCase(contentType) ||
+                (file.getOriginalFilename() != null && file.getOriginalFilename().toLowerCase().endsWith(".pdf"));
+        if (!isImage && !isPdf) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Only JPG, PNG, WEBP images or PDF files are supported"));
         }
         String url = cloudinaryService.uploadImage(file);
         if (url == null) {
@@ -196,6 +207,8 @@ public class ItemController {
             mediaType = MediaType.IMAGE_PNG;
         } else if (lower.endsWith(".webp")) {
             mediaType = MediaType.parseMediaType("image/webp");
+        } else if (lower.endsWith(".pdf")) {
+            mediaType = MediaType.APPLICATION_PDF;
         } else if (lower.endsWith(".gif")) {
             mediaType = MediaType.IMAGE_GIF;
         }

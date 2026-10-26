@@ -15,13 +15,10 @@ public class CreateClaimRequest {
 
     private String proofDetails;
 
-    public CreateClaimRequest() {}
+    /** URL of uploaded evidence file (photo of bill, receipt, etc.) — uploaded via item-service first */
+    private String proofFileUrl;
 
-    public CreateClaimRequest(Long itemId, String ownershipDescription, String proofDetails) {
-        this.itemId = itemId;
-        this.ownershipDescription = ownershipDescription;
-        this.proofDetails = proofDetails;
-    }
+    public CreateClaimRequest() {}
 
     public Long getItemId() { return itemId; }
     public void setItemId(Long itemId) { this.itemId = itemId; }
@@ -31,4 +28,7 @@ public class CreateClaimRequest {
 
     public String getProofDetails() { return proofDetails; }
     public void setProofDetails(String proofDetails) { this.proofDetails = proofDetails; }
+
+    public String getProofFileUrl() { return proofFileUrl; }
+    public void setProofFileUrl(String proofFileUrl) { this.proofFileUrl = proofFileUrl; }
 }

@@ -50,6 +50,7 @@ public class SecurityConfig {
 
                         // Admin operations
                         .requestMatchers("/api/items/admin/**").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/items/*/admin").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
 
                         // Authenticated operations
                         .requestMatchers(HttpMethod.POST, "/api/items/upload-image").authenticated()
